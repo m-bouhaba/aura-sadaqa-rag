@@ -1,7 +1,7 @@
 'use client'
 
 import React from "react"
-
+import { askAssistant } from '@/actions/chat-action'
 import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { SendIcon, LoaderIcon } from 'lucide-react'
@@ -49,18 +49,32 @@ export function ChatPanel() {
     setInput('')
     setIsLoading(true)
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const answer = await askAssistant(userMessage.content)
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Thank you for your message. I\'m processing your request. How can I assist you further with your Ramadan activities?',
+        content: answer,
         timestamp: new Date(),
       }
+
       setMessages((prev) => [...prev, assistantMessage])
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: 'An error occurred while talking to the assistant.',
+          timestamp: new Date(),
+        },
+      ])
+    } finally {
       setIsLoading(false)
-    }, 1500)
+    }
   }
+
 
   return (
     <div className="flex w-[100%] h-[100vh] flex-col border-r border-border bg-card">
@@ -72,11 +86,10 @@ export function ChatPanel() {
             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
           >
             <div
-              className={`max-w-xs rounded-lg px-4 py-3 text-sm leading-relaxed shadow-sm ${
-                message.role === 'user'
+              className={`max-w-xs rounded-lg px-4 py-3 text-sm leading-relaxed shadow-sm ${message.role === 'user'
                   ? 'bg-primary text-primary-foreground rounded-br-none'
                   : 'bg-secondary text-secondary-foreground rounded-bl-none'
-              }`}
+                }`}
             >
               {message.content}
             </div>
