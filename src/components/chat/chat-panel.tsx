@@ -1,10 +1,9 @@
 'use client'
 
-import React from "react"
+import React, { useState, useRef, useEffect } from 'react'
 import { askAssistant } from '@/actions/chat-action'
-import { useState, useRef, useEffect } from 'react'
+import { SendIcon, BotIcon, UserIcon, SparklesIcon, MoonIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { SendIcon, LoaderIcon } from 'lucide-react'
 
 interface Message {
   id: string
@@ -14,29 +13,33 @@ interface Message {
 }
 
 export function ChatPanel() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      role: 'assistant',
-      content: 'Assalamu alaikum! Welcome to Aura-Sadaqa. I\'m here to help you manage families, donations, and volunteers during this blessed month of Ramadan.',
-      timestamp: new Date(),
-    },
-  ])
+  const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
+  // Initial Greeting
   useEffect(() => {
-    scrollToBottom()
+    if (messages.length === 0) {
+      setMessages([
+        {
+          id: 'init-1',
+          role: 'assistant',
+          content: 'Salam 🌙 Ramadan Kareem! How can I assist you with your preparations today?',
+          timestamp: new Date(),
+        }
+      ])
+    }
+  }, [])
+
+  // Auto-scroll
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const handleSendMessage = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!input.trim()) return
+    if (!input.trim() || isLoading) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -75,33 +78,49 @@ export function ChatPanel() {
     }
   }
 
-
   return (
-    <div className="flex w-[100%] h-[100vh] flex-col border-r border-border bg-card">
+    <div className="flex flex-col h-full bg-background relative">
+      {/* Decorative Background for Chat Area */}
+      <div className="absolute inset-0 bg-[url('/islamic-pattern-opacity.png')] bg-repeat opacity-[0.03] pointer-events-none" />
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
-          >
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 z-10">
+        {messages.map((message) => {
+          const isUser = message.role === 'user'
+          return (
             <div
-              className={`max-w-xs rounded-lg px-4 py-3 text-sm leading-relaxed shadow-sm ${message.role === 'user'
-                  ? 'bg-primary text-primary-foreground rounded-br-none'
-                  : 'bg-secondary text-secondary-foreground rounded-bl-none'
-                }`}
+              key={message.id}
+              className={`flex items-end gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
             >
-              {message.content}
-            </div>
-          </div>
-        ))}
-        {isLoading && (
-          <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div className="bg-secondary text-secondary-foreground rounded-lg rounded-bl-none px-4 py-3 shadow-sm">
-              <div className="flex items-center gap-2">
-                <LoaderIcon className="h-4 w-4 animate-spin" />
-                <span className="text-sm">Thinking...</span>
+              {/* Avatar */}
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${isUser ? 'bg-secondary text-secondary-foreground' : 'bg-primary text-primary-foreground'
+                }`}>
+                {isUser ? <UserIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5 fill-current" />}
               </div>
+
+              {/* Bubble */}
+              <div
+                className={`max-w-[80%] rounded-2xl px-5 py-3 shadow-sm text-sm leading-relaxed ${isUser
+                    ? 'bg-secondary text-secondary-foreground rounded-br-none'
+                    : 'bg-card border border-border text-foreground rounded-bl-none'
+                  }`}
+              >
+                <p className="whitespace-pre-wrap">{message.content}</p>
+              </div>
+            </div>
+          )
+        })}
+        {isLoading && (
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center animate-pulse">
+              <SparklesIcon className="w-4 h-4 text-primary" />
+            </div>
+            <div className="bg-card px-4 py-2 rounded-lg border border-border shadow-sm">
+              <span className="text-xs text-muted-foreground flex gap-1">
+                <span className="animate-bounce delay-0">.</span>
+                <span className="animate-bounce delay-150">.</span>
+                <span className="animate-bounce delay-300">.</span>
+              </span>
             </div>
           </div>
         )}
@@ -109,24 +128,27 @@ export function ChatPanel() {
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-border bg-card p-4">
-        <form onSubmit={handleSendMessage} className="flex gap-3">
+      <div className="p-4 bg-card/80 backdrop-blur-md border-t border-border z-20">
+        <form onSubmit={handleSubmit} className="relative flex items-center gap-2 max-w-4xl mx-auto">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask me anything about Ramadan..."
-            className="flex-1 rounded-lg border border-border bg-background px-4 py-2 text-sm placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-card transition-all"
-            disabled={isLoading}
+            placeholder="Ask anything about the uploaded documents..."
+            className="flex-1 bg-muted/50 hover:bg-muted transition-colors border-0 rounded-full px-6 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-inner"
           />
           <Button
             type="submit"
+            size="icon"
             disabled={isLoading || !input.trim()}
-            className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
+            className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-110"
           >
-            <SendIcon className="h-4 w-4" />
+            <SendIcon className="w-5 h-5 ml-0.5" />
           </Button>
         </form>
+        <div className="text-center mt-2">
+          <p className="text-[10px] text-muted-foreground opacity-60">AI can make mistakes. Please verify important information.</p>
+        </div>
       </div>
     </div>
   )

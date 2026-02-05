@@ -1,18 +1,84 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #ffffff;
-  --color-card: #fffaf3;
+  /* Base */
+  --color-background: #0f172a; /* Midnight Blue */
+  --color-foreground: #f8fafc; /* Slate 50 */
 
-  --color-primary: #6b4f3f;          /* marron doux */
-  --color-primary-foreground: #ffffff;
+  /* Cards & Panels */
+  --color-card: #1e293b; /* Slate 800 */
+  --color-card-foreground: #e2e8f0; /* Slate 200 */
 
-  --color-secondary: #f5f0e8;        /* beige clair */
-  --color-secondary-foreground: #3b2f2f;
+  /* Popovers */
+  --color-popover: #0f172a;
+  --color-popover-foreground: #f8fafc;
 
-  --color-accent: #f4c96d;           /* jaune lanterne */
-  --color-accent-foreground: #3b2f2f;
+  /* Primary (Gold/Amber) */
+  --color-primary: #fbbf24; /* Amber 400 */
+  --color-primary-foreground: #1e293b;
 
-  --color-border: #e7dccf;
-  --color-muted-foreground: #8a7f73;
+  /* Secondary (Emerald Green) */
+  --color-secondary: #059669; /* Emerald 600 */
+  --color-secondary-foreground: #ffffff;
+
+  /* Muted */
+  --color-muted: #334155; /* Slate 700 */
+  --color-muted-foreground: #94a3b8; /* Slate 400 */
+
+  /* Accent (Soft Gold) */
+  --color-accent: #fcd34d; /* Amber 300 */
+  --color-accent-foreground: #1e293b;
+
+  /* Destructive */
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #f8fafc;
+
+  /* Borders & Inputs */
+  --color-border: #334155;
+  --color-input: #334155;
+  --color-ring: #fbbf24;
+
+  /* Charts/Data (Optional) */
+  --color-chart-1: #fbbf24;
+  --color-chart-2: #059669;
+  --color-chart-3: #3b82f6;
+  --color-chart-4: #a855f7;
+  --color-chart-5: #ec4899;
+}
+
+/* Custom Utilities for Patterns */
+.bg-pattern {
+  background-image: radial-gradient(#fbbf24 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.1;
+}
+
+/* Light Mode Overrides (if user wants light mode) */
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-background: #ffffff;
+    --color-foreground: #0f172a;
+
+    --color-card: #ffffff;
+    --color-card-foreground: #0f172a;
+
+    --color-popover: #ffffff;
+    --color-popover-foreground: #0f172a;
+
+    --color-primary: #d97706; /* Amber 600 - darker for light mode text */
+    --color-primary-foreground: #ffffff;
+
+    --color-secondary: #10b981; /* Emerald 500 */
+    --color-secondary-foreground: #ffffff;
+
+    --color-muted: #f1f5f9;
+    --color-muted-foreground: #64748b;
+
+    --color-accent: #fef3c7; /* Amber 100 */
+    --color-accent-foreground: #0f172a;
+
+    --color-border: #e2e8f0;
+    --color-input: #e2e8f0;
+    --color-ring: #d97706;
+  }
 }

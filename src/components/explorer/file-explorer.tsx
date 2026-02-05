@@ -1,156 +1,108 @@
 'use client'
 
-import { useState } from 'react'
+import * as React from "react"
 import {
-  FileIcon,
+  SearchIcon,
   FileTextIcon,
-  FileSpreadsheetIcon,
-  DownloadIcon,
-  TrashIcon,
-} from 'lucide-react'
+  MoreVerticalIcon,
+  LayoutGridIcon,
+} from "lucide-react"
+
 import { UploadButton } from '@/components/upload/upload-button'
 
-interface DocumentFile {
+interface ExplorerFile {
   id: string
-  name: string
-  type: 'pdf' | 'excel' | 'txt' | 'csv'
-  size: string
-  uploadDate: string
+  title: string
+  date: string
+  type: string
 }
 
 export function FileExplorer() {
-  // ✅ START EMPTY (no static data)
-  const [files, setFiles] = useState<DocumentFile[]>([])
+  const [files, setFiles] = React.useState<ExplorerFile[]>([])
+  const [search, setSearch] = React.useState("")
 
-  const getFileIcon = (type: DocumentFile['type']) => {
-    switch (type) {
-      case 'pdf':
-        return <FileTextIcon className="h-5 w-5 text-red-500" />
-      case 'excel':
-      case 'csv':
-        return <FileSpreadsheetIcon className="h-5 w-5 text-green-700" />
-      case 'txt':
-        return <FileTextIcon className="h-5 w-5 text-gray-500" />
-      default:
-        return <FileIcon className="h-5 w-5 text-gray-400" />
-    }
-  }
-
-  const handleDelete = (id: string) => {
-    setFiles(prev => prev.filter(file => file.id !== id))
-  }
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    })
-  }
-
-  // ✅ Called after REAL upload
   const handleUploadComplete = (file: File) => {
-    const extension = file.name.split('.').pop()?.toLowerCase()
-
-    const newFile: DocumentFile = {
+    const newFile: ExplorerFile = {
       id: crypto.randomUUID(),
-      name: file.name,
-      type:
-        extension === 'pdf'
-          ? 'pdf'
-          : extension === 'xlsx'
-          ? 'excel'
-          : extension === 'csv'
-          ? 'csv'
-          : 'txt',
-      size:
-        file.size < 1024 * 1024
-          ? `${(file.size / 1024).toFixed(1)} KB`
-          : `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-      uploadDate: new Date().toISOString(),
+      title: file.name,
+      date: "Just now",
+      type: file.name.split('.').pop() || 'file',
     }
 
-    setFiles(prev => [newFile, ...prev])
+    setFiles((prev) => [newFile, ...prev])
   }
+
+  const filteredFiles = files.filter((file) =>
+    file.title.toLowerCase().includes(search.toLowerCase())
+  )
 
   return (
-    <div className="flex w-full h-screen flex-col bg-background">
+    <div className="flex flex-col h-full bg-card/50 backdrop-blur-xl border-r border-border/50">
       {/* Header */}
-      <div className="border-b border-border bg-card px-8 py-5 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-foreground">Documents</h2>
-            <p className="text-sm text-muted-foreground">
-              Uploaded files and resources
-            </p>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-medium text-muted-foreground">
-              {files.length} {files.length === 1 ? 'file' : 'files'}
-            </span>
-
-            <UploadButton onUploadComplete={handleUploadComplete} />
-          </div>
+      <div className="p-4 border-b border-border/50 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <LayoutGridIcon className="w-5 h-5 text-primary" />
+          <h2 className="font-semibold tracking-tight">Documents</h2>
+        </div>
+        <div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+          {files.length} {files.length === 1 ? "File" : "Files"}
         </div>
       </div>
 
-      {/* Files List */}
-      <div className="flex-1 overflow-y-auto p-6">
-        {files.length === 0 ? (
-          <div className="flex h-full items-center justify-center">
-            <div className="text-center">
-              <FileIcon className="mx-auto h-12 w-12 text-muted-foreground/30 mb-3" />
-              <p className="text-sm text-muted-foreground">
-                No files uploaded yet
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Upload a PDF or XLSX file to get started
-              </p>
-            </div>
+      {/* Actions */}
+      <div className="p-4 space-y-4">
+        <UploadButton onUploadComplete={handleUploadComplete} />
+
+        <div className="relative">
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-muted/50 border border-border rounded-lg pl-9 pr-4 py-2 text-sm
+              focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all
+              placeholder:text-muted-foreground/70"
+            placeholder="Search documents..."
+          />
+        </div>
+      </div>
+
+      {/* File List */}
+      <div className="flex-1 overflow-y-auto px-2">
+        {filteredFiles.length === 0 ? (
+          <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground px-6">
+            <FileTextIcon className="w-10 h-10 mb-3 opacity-40" />
+            <p className="text-sm font-medium">No documents yet</p>
+            <p className="text-xs mt-1">
+              Upload PDF or XLSX files to build your knowledge base
+            </p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {files.map(file => (
+          <div className="space-y-1 pb-4">
+            {filteredFiles.map((file) => (
               <div
                 key={file.id}
-                className="group flex items-center justify-between rounded-lg border border-border bg-card p-4 shadow-sm hover:shadow-md hover:border-primary/30 transition-all"
+                className="group flex items-center gap-3 p-3 rounded-lg
+                  hover:bg-muted/60 transition-colors cursor-pointer
+                  border border-transparent hover:border-border/50"
               >
-                <div className="flex items-center gap-4 flex-1">
-                  <div className="rounded-lg bg-muted p-2">
-                    {getFileIcon(file.type)}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground truncate text-sm">
-                      {file.name}
-                    </p>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-                      <span>{file.size}</span>
-                      <span>•</span>
-                      <span>{formatDate(file.uploadDate)}</span>
-                    </div>
-                  </div>
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center
+                  text-primary shrink-0 group-hover:bg-primary/20 transition-colors">
+                  <FileTextIcon className="w-5 h-5" />
                 </div>
 
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
-                    title="Download"
-                    disabled
-                  >
-                    <DownloadIcon className="h-4 w-4" />
-                  </button>
-
-                  <button
-                    onClick={() => handleDelete(file.id)}
-                    className="rounded-md p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                    title="Delete"
-                  >
-                    <TrashIcon className="h-4 w-4" />
-                  </button>
+                <div className="flex-1 overflow-hidden">
+                  <h3 className="text-sm font-medium truncate text-foreground/90">
+                    {file.title}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">{file.date}</p>
                 </div>
+
+                <button
+                  className="text-muted-foreground hover:text-foreground
+                    opacity-0 group-hover:opacity-100 transition-opacity p-2"
+                >
+                  <MoreVerticalIcon className="w-4 h-4" />
+                </button>
               </div>
             ))}
           </div>
