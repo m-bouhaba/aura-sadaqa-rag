@@ -7,7 +7,7 @@ import * as XLSX from 'xlsx'
 
 // Gemini Embeddings
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-const model = genAI.getGenerativeModel({ model: 'text-embedding-004' })
+const model = genAI.getGenerativeModel({ model: 'all-MiniLM-L6-v2' })
 
 async function generateEmbedding(text: string): Promise<number[]> {
   const res = await model.embedContent(text)

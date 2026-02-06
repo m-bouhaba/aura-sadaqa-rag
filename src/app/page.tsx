@@ -1,69 +1,65 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Sparkles, Moon } from 'lucide-react'
+import { ArrowRight, Moon } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-pattern pointer-events-none" />
+    <div className="relative min-h-screen overflow-hidden text-foreground">
 
-      {/* Decorative Glows */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[128px]" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[128px]" />
+      {/* Video Background */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover scale-105 blur-none"
+      >
+        <source src="/delete.mp4" type="video/mp4" />
+      </video>
 
-      <main className="container max-w-6xl px-4 py-16 flex flex-col items-center text-center z-10">
+      {/* Overlays */}
+      <div className="absolute inset-0 bg-black/65" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/70 to-black/90" />
 
-        {/* Hero Title */}
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+      {/* Content */}
+      <main className="relative z-10 min-h-screen flex flex-col items-center justify-center text-center px-4">
+
+        <div className="mb-6 flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/20 backdrop-blur ring-1 ring-primary/30">
+          <img
+            src="/logo.png"   // ← mets ici le nom exact de ton image
+            alt="Aura Sadaqa logo"
+            width={150}
+            height={150}
+            className="object-contain"
+           
+          />
+        </div>
+
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 animate-in fade-in slide-in-from-bottom-4">
           Ramadan <span className="text-primary">AI Assistant</span>
         </h1>
 
-        {/* Hero Subtitle */}
-        <p className="text-xl text-muted-foreground max-w-2xl mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-          Simplify your activities this holy month. Chat with your documents, organize schedules, and manage resources with our dedicated AI companion.
+        <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mb-10">
+          Upload your documents. Ask questions.
+          Understand faster — powered by AI.
         </p>
 
-        {/* CTA Button */}
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-          <Link href="/dashboard">
-            <Button size="lg" className="h-14 px-8 text-lg rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:scale-105">
-              Go to Dashboard
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </Link>
-        </div>
-
-        {/* Hero Image */}
-        <div className="mt-16 w-full max-w-4xl relative animate-in fade-in zoom-in-95 duration-1000 delay-500">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-30" />
-          <div className="relative rounded-2xl overflow-hidden border border-border/50 shadow-2xl">
-            <Image
-              src="/ramadan.png"
-              alt="Ramadan Dashboard Preview"
-              width={1200}
-              height={675}
-              className="w-full h-auto object-cover bg-card"
-              priority
-            />
-            {/* Fallback placeholder if image is missing/loading */}
-            <div className="absolute inset-0 flex items-center justify-center bg-card/50 backdrop-blur-sm opacity-0 hover:opacity-100 transition-opacity duration-500">
-              <div className="text-center">
-                <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
-                <p className="text-lg font-medium">Experience the serenity</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
+        <Link href="/dashboard">
+          <Button
+            size="lg"
+            className="h-14 px-10 text-lg rounded-full bg-primary hover:bg-primary/90 shadow-xl shadow-primary/30 transition-all hover:scale-105"
+          >
+            Go to Dashboard
+            <ArrowRight className="ml-2 w-5 h-5" />
+          </Button>
+        </Link>
       </main>
 
-      {/* Footer */}
-      <footer className="w-full py-6 mt-auto border-t border-border/40 text-center text-sm text-muted-foreground">
-        <p>© 2026 Aura Sadaqa. Built with ❤️ for the Ummah.</p>
+      <footer className="relative z-10 w-full py-6 text-center text-sm text-muted-foreground border-t border-white/10">
+        © 2026 Aura Sadaqa — AI for meaningful impact
       </footer>
     </div>
   )

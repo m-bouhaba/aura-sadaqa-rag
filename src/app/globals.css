@@ -1,84 +1,96 @@
 @import "tailwindcss";
 
 @theme {
-  /* Base */
-  --color-background: #0f172a; /* Midnight Blue */
-  --color-foreground: #f8fafc; /* Slate 50 */
+  /* =========================
+      Base - Deep Night & Moonlight
+  ========================== */
+  --color-background: #050811; /* Darker, deeper night sky */
+  --color-foreground: #f4f4f9; /* Soft moonlight white */
 
-  /* Cards & Panels */
-  --color-card: #1e293b; /* Slate 800 */
-  --color-card-foreground: #e2e8f0; /* Slate 200 */
+  /* =========================
+      Cards & Panels - Glassmorphism ready
+  ========================== */
+  --color-card: #0a1122; 
+  --color-card-foreground: #e2e8f0;
 
-  /* Popovers */
-  --color-popover: #0f172a;
-  --color-popover-foreground: #f8fafc;
+  /* =========================
+      Popovers
+  ========================== */
+  --color-popover: #0a1122;
+  --color-popover-foreground: #f4f4f9;
 
-  /* Primary (Gold/Amber) */
-  --color-primary: #fbbf24; /* Amber 400 */
-  --color-primary-foreground: #1e293b;
+  /* =========================
+      Primary — The Golden Lantern Glow
+  ========================== */
+  --color-primary: #d4af37; /* Metallic Gold */
+  --color-primary-foreground: #050811;
 
-  /* Secondary (Emerald Green) */
-  --color-secondary: #059669; /* Emerald 600 */
-  --color-secondary-foreground: #ffffff;
+  /* =========================
+      Secondary — Warm Amber
+  ========================== */
+  --color-secondary: #f59e0b; /* Amber 500 */
+  --color-secondary-foreground: #050811;
 
-  /* Muted */
-  --color-muted: #334155; /* Slate 700 */
-  --color-muted-foreground: #94a3b8; /* Slate 400 */
+  /* =========================
+      Muted
+  ========================== */
+  --color-muted: #1a2238; 
+  --color-muted-foreground: #94a3b8;
 
-  /* Accent (Soft Gold) */
-  --color-accent: #fcd34d; /* Amber 300 */
-  --color-accent-foreground: #1e293b;
+  /* =========================
+      Accent — Soft Sand/Silk Glow
+  ========================== */
+  --color-accent: #ffedd5; /* Warm Orange 50 */
+  --color-accent-foreground: #050811;
 
-  /* Destructive */
+  /* =========================
+      Destructive
+  ========================== */
   --color-destructive: #ef4444;
-  --color-destructive-foreground: #f8fafc;
+  --color-destructive-foreground: #ffffff;
 
-  /* Borders & Inputs */
-  --color-border: #334155;
-  --color-input: #334155;
-  --color-ring: #fbbf24;
+  /* =========================
+      Borders & Inputs
+  ========================== */
+  --color-border: #2d3748;
+  --color-input: #1a2238;
+  --color-ring: #d4af37;
 
-  /* Charts/Data (Optional) */
-  --color-chart-1: #fbbf24;
-  --color-chart-2: #059669;
-  --color-chart-3: #3b82f6;
-  --color-chart-4: #a855f7;
-  --color-chart-5: #ec4899;
+  /* =========================
+      Charts / Data - Ramadan Palette
+  ========================== */
+  --color-chart-1: #d4af37; /* Gold */
+  --color-chart-2: #f59e0b; /* Amber */
+  --color-chart-3: #10b981; /* Emerald (Islamic Green) */
+  --color-chart-4: #fbbf24; /* Yellow */
+  --color-chart-5: #6366f1; /* Indigo Sky */
 }
 
-/* Custom Utilities for Patterns */
+/* =========================
+   Background Pattern (Islamic Geometric Subtle)
+========================== */
 .bg-pattern {
-  background-image: radial-gradient(#fbbf24 1px, transparent 1px);
-  background-size: 20px 20px;
-  opacity: 0.1;
+  /* Using a warm gold tint for the subtle dots */
+  background-image: radial-gradient(
+    rgba(212, 175, 55, 0.15) 1px, 
+    transparent 1px
+  );
+  background-size: 30px 30px;
+  opacity: 0.12;
 }
 
-/* Light Mode Overrides (if user wants light mode) */
-@media (prefers-color-scheme: light) {
-  :root {
-    --color-background: #ffffff;
-    --color-foreground: #0f172a;
+/* =========================
+   Hero Video Enhancements
+========================== */
+.hero-video-container {
+  position: relative;
+  overflow: hidden;
+}
 
-    --color-card: #ffffff;
-    --color-card-foreground: #0f172a;
-
-    --color-popover: #ffffff;
-    --color-popover-foreground: #0f172a;
-
-    --color-primary: #d97706; /* Amber 600 - darker for light mode text */
-    --color-primary-foreground: #ffffff;
-
-    --color-secondary: #10b981; /* Emerald 500 */
-    --color-secondary-foreground: #ffffff;
-
-    --color-muted: #f1f5f9;
-    --color-muted-foreground: #64748b;
-
-    --color-accent: #fef3c7; /* Amber 100 */
-    --color-accent-foreground: #0f172a;
-
-    --color-border: #e2e8f0;
-    --color-input: #e2e8f0;
-    --color-ring: #d97706;
-  }
+/* Adds a vignette effect to blend the video edges into your background color */
+.hero-video-overlay {
+  background: radial-gradient(circle, transparent 20%, var(--color-background) 100%);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
