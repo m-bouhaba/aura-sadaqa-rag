@@ -2,9 +2,13 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { askAssistant } from '@/actions/chat-action'
-import { SendIcon, BotIcon, UserIcon, SparklesIcon, MoonIcon } from 'lucide-react'
+import { SendIcon, UserIcon, SparklesIcon, MoonIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import ReactMarkdown from 'react-markdown'
 
+// ---------------------
+// Types
+// ---------------------
 interface Message {
   id: string
   role: 'user' | 'assistant'
@@ -12,6 +16,119 @@ interface Message {
   timestamp: Date
 }
 
+// ---------------------
+// Markdown Renderer Component
+// This takes raw markdown text and renders it as nice HTML
+// ---------------------
+function FormattedMessage({ content }: { content: string }) {
+  return (
+    <ReactMarkdown
+      components={{
+        // Headings — bold and slightly larger
+        h1: ({ children }) => (
+          <h1 className="text-lg font-bold mb-2 mt-1">{children}</h1>
+        ),
+        h2: ({ children }) => (
+          <h2 className="text-base font-bold mb-2 mt-1">{children}</h2>
+        ),
+        h3: ({ children }) => (
+          <h3 className="text-sm font-bold mb-1 mt-1">{children}</h3>
+        ),
+
+        // Paragraphs — normal text with spacing
+        p: ({ children }) => (
+          <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>
+        ),
+
+        // Bold text
+        strong: ({ children }) => (
+          <strong className="font-semibold text-foreground">{children}</strong>
+        ),
+
+        // Italic text
+        em: ({ children }) => (
+          <em className="italic">{children}</em>
+        ),
+
+        // Unordered lists (bullet points)
+        ul: ({ children }) => (
+          <ul className="list-disc list-inside mb-2 space-y-1 pl-1">{children}</ul>
+        ),
+
+        // Ordered lists (numbered)
+        ol: ({ children }) => (
+          <ol className="list-decimal list-inside mb-2 space-y-1 pl-1">{children}</ol>
+        ),
+
+        // List items
+        li: ({ children }) => (
+          <li className="leading-relaxed">{children}</li>
+        ),
+
+        // Inline code (e.g. `variable`)
+        code: ({ children }) => (
+          <code className="bg-muted/70 text-primary px-1.5 py-0.5 rounded text-xs font-mono">
+            {children}
+          </code>
+        ),
+
+        // Code blocks (```)
+        pre: ({ children }) => (
+          <pre className="bg-muted/50 border border-border rounded-lg p-3 mb-2 overflow-x-auto text-xs font-mono">
+            {children}
+          </pre>
+        ),
+
+        // Tables — clean and readable
+        table: ({ children }) => (
+          <div className="overflow-x-auto mb-2 rounded-lg border border-border">
+            <table className="w-full text-xs">{children}</table>
+          </div>
+        ),
+        thead: ({ children }) => (
+          <thead className="bg-muted/60 border-b border-border">{children}</thead>
+        ),
+        tbody: ({ children }) => (
+          <tbody className="divide-y divide-border/50">{children}</tbody>
+        ),
+        tr: ({ children }) => (
+          <tr className="hover:bg-muted/30 transition-colors">{children}</tr>
+        ),
+        th: ({ children }) => (
+          <th className="px-3 py-2 text-left font-semibold text-foreground">{children}</th>
+        ),
+        td: ({ children }) => (
+          <td className="px-3 py-2 text-muted-foreground">{children}</td>
+        ),
+
+        // Blockquotes
+        blockquote: ({ children }) => (
+          <blockquote className="border-l-3 border-primary/50 pl-3 italic text-muted-foreground mb-2">
+            {children}
+          </blockquote>
+        ),
+
+        // Horizontal rule
+        hr: () => (
+          <hr className="my-3 border-border/50" />
+        ),
+
+        // Links
+        a: ({ href, children }) => (
+          <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/80 transition-colors">
+            {children}
+          </a>
+        ),
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  )
+}
+
+// ---------------------
+// Main Chat Panel
+// ---------------------
 export function ChatPanel() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -32,7 +149,7 @@ export function ChatPanel() {
     }
   }, [])
 
-  // Auto-scroll
+  // Auto-scroll when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
@@ -80,7 +197,7 @@ export function ChatPanel() {
 
   return (
     <div className="flex flex-col h-full bg-background relative">
-      {/* Decorative Background for Chat Area */}
+      {/* Decorative Background */}
       <div className="absolute inset-0 bg-[url('/islamic-pattern-opacity.png')] bg-repeat opacity-[0.03] pointer-events-none" />
 
       {/* Messages Area */}
@@ -98,18 +215,29 @@ export function ChatPanel() {
                 {isUser ? <UserIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5 fill-current" />}
               </div>
 
-              {/* Bubble */}
+              {/* Message Bubble */}
               <div
-                className={`max-w-[80%] rounded-2xl px-5 py-3 shadow-sm text-sm leading-relaxed ${isUser
+                className={`max-w-[80%] rounded-2xl px-5 py-3 shadow-sm text-sm ${isUser
                     ? 'bg-secondary text-secondary-foreground rounded-br-none'
                     : 'bg-card border border-border text-foreground rounded-bl-none'
                   }`}
               >
-                <p className="whitespace-pre-wrap">{message.content}</p>
+                {/* 
+                  KEY CHANGE: 
+                  - User messages = plain text (no markdown needed)
+                  - Assistant messages = rendered as formatted markdown
+                */}
+                {isUser ? (
+                  <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                ) : (
+                  <FormattedMessage content={message.content} />
+                )}
               </div>
             </div>
           )
         })}
+
+        {/* Loading Animation */}
         {isLoading && (
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center animate-pulse">

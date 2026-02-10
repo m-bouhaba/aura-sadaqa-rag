@@ -7,7 +7,7 @@ import * as XLSX from 'xlsx'
 
 // Gemini Embeddings
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-const model = genAI.getGenerativeModel({ model: 'all-MiniLM-L6-v2' })
+const model = genAI.getGenerativeModel({ model: 'gemini-embedding-001' })
 
 async function generateEmbedding(text: string): Promise<number[]> {
   const res = await model.embedContent(text)
@@ -45,7 +45,20 @@ export async function uploadFile(formData: FormData) {
     const wb = XLSX.read(buffer, { type: 'buffer' })
     wb.SheetNames.forEach(name => {
       const sheet = wb.Sheets[name]
-      text += XLSX.utils.sheet_to_txt(sheet) + '\n'
+      // Smart parsing: Convert to JSON to preserve header-value relationships
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" }) as Record<string, any>[]
+
+      if (rows.length > 0) {
+        text += `--- Sheet: ${name} ---\n`
+        rows.forEach((row, index) => {
+          // Convert row object to a readable string: "Name: Ahmed, Age: 30..."
+          const rowText = Object.entries(row)
+            .filter(([_, val]) => val !== "") // Skip empty cells
+            .map(([header, val]) => `${header}: ${val}`)
+            .join(", ")
+          text += `Row ${index + 1}: ${rowText}\n`
+        })
+      }
     })
   } else {
     return { success: false, message: 'Unsupported file type' }
@@ -60,19 +73,19 @@ export async function uploadFile(formData: FormData) {
   for (let i = 0; i < chunks.length; i++) {
     const embedding = await generateEmbedding(chunks[i])
     await index.upsert({
-  namespace: 'documents', // 👈 AJOUT CRUCIAL
-  records: [
-    {
-      id: `${file.name}-${i}-${Date.now()}`,
-      values: embedding,
-      metadata: {
-        file: file.name,
-        chunk: i,
-        text: chunks[i],
-      },
-    },
-  ],
-})
+      namespace: 'documents', // 👈 AJOUT CRUCIAL
+      records: [
+        {
+          id: `${file.name}-${i}-${Date.now()}`,
+          values: embedding,
+          metadata: {
+            file: file.name,
+            chunk: i,
+            text: chunks[i],
+          },
+        },
+      ],
+    })
   }
 
   return { success: true, chunks: chunks.length }

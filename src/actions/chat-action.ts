@@ -11,7 +11,7 @@ export async function askAssistant(question: string) {
         if (!question || !question.trim()) return "Please provide a question."
 
         // 1. Generate text embedding for the question
-        const embeddingModel = genAI.getGenerativeModel({ model: 'text-embedding-004' })
+        const embeddingModel = genAI.getGenerativeModel({ model: 'gemini-embedding-001' })
         const embeddingResult = await embeddingModel.embedContent(question)
         const vector = embeddingResult.embedding.values
 
