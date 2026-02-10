@@ -24,98 +24,73 @@ function FormattedMessage({ content }: { content: string }) {
   return (
     <ReactMarkdown
       components={{
-        // Headings — bold and slightly larger
         h1: ({ children }) => (
-          <h1 className="text-lg font-bold mb-2 mt-1">{children}</h1>
+          <h1 className="text-lg font-bold mb-2 mt-1 text-foreground">{children}</h1>
         ),
         h2: ({ children }) => (
-          <h2 className="text-base font-bold mb-2 mt-1">{children}</h2>
+          <h2 className="text-base font-bold mb-2 mt-1 text-foreground">{children}</h2>
         ),
         h3: ({ children }) => (
-          <h3 className="text-sm font-bold mb-1 mt-1">{children}</h3>
+          <h3 className="text-sm font-bold mb-1 mt-1 text-foreground">{children}</h3>
         ),
-
-        // Paragraphs — normal text with spacing
         p: ({ children }) => (
-          <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>
+          <p className="mb-2 last:mb-0 leading-relaxed text-card-foreground/90">{children}</p>
         ),
-
-        // Bold text
         strong: ({ children }) => (
-          <strong className="font-semibold text-foreground">{children}</strong>
+          <strong className="font-semibold text-primary/90">{children}</strong>
         ),
-
-        // Italic text
         em: ({ children }) => (
-          <em className="italic">{children}</em>
+          <em className="italic text-card-foreground/70">{children}</em>
         ),
-
-        // Unordered lists (bullet points)
         ul: ({ children }) => (
           <ul className="list-disc list-inside mb-2 space-y-1 pl-1">{children}</ul>
         ),
-
-        // Ordered lists (numbered)
         ol: ({ children }) => (
           <ol className="list-decimal list-inside mb-2 space-y-1 pl-1">{children}</ol>
         ),
-
-        // List items
         li: ({ children }) => (
-          <li className="leading-relaxed">{children}</li>
+          <li className="leading-relaxed text-card-foreground/85">{children}</li>
         ),
-
-        // Inline code (e.g. `variable`)
         code: ({ children }) => (
-          <code className="bg-muted/70 text-primary px-1.5 py-0.5 rounded text-xs font-mono">
+          <code className="bg-secondary/10 text-secondary px-1.5 py-0.5 rounded text-[11px] font-mono border border-secondary/10">
             {children}
           </code>
         ),
-
-        // Code blocks (```)
         pre: ({ children }) => (
-          <pre className="bg-muted/50 border border-border rounded-lg p-3 mb-2 overflow-x-auto text-xs font-mono">
+          <pre className="bg-black/30 border border-white/[0.06] rounded-xl p-3.5 mb-2 overflow-x-auto text-[11px] font-mono">
             {children}
           </pre>
         ),
-
-        // Tables — clean and readable
         table: ({ children }) => (
-          <div className="overflow-x-auto mb-2 rounded-lg border border-border">
-            <table className="w-full text-xs">{children}</table>
+          <div className="overflow-x-auto mb-2 rounded-xl border border-white/[0.08]">
+            <table className="w-full text-[11px]">{children}</table>
           </div>
         ),
         thead: ({ children }) => (
-          <thead className="bg-muted/60 border-b border-border">{children}</thead>
+          <thead className="bg-white/[0.03] border-b border-white/[0.06]">{children}</thead>
         ),
         tbody: ({ children }) => (
-          <tbody className="divide-y divide-border/50">{children}</tbody>
+          <tbody className="divide-y divide-white/[0.04]">{children}</tbody>
         ),
         tr: ({ children }) => (
-          <tr className="hover:bg-muted/30 transition-colors">{children}</tr>
+          <tr className="hover:bg-white/[0.02] transition-colors">{children}</tr>
         ),
         th: ({ children }) => (
-          <th className="px-3 py-2 text-left font-semibold text-foreground">{children}</th>
+          <th className="px-3 py-2 text-left font-semibold text-foreground/80 text-[10px] uppercase tracking-wider">{children}</th>
         ),
         td: ({ children }) => (
-          <td className="px-3 py-2 text-muted-foreground">{children}</td>
+          <td className="px-3 py-2 text-card-foreground/70">{children}</td>
         ),
-
-        // Blockquotes
         blockquote: ({ children }) => (
-          <blockquote className="border-l-3 border-primary/50 pl-3 italic text-muted-foreground mb-2">
+          <blockquote className="border-l-2 border-primary/40 pl-3 italic text-card-foreground/60 mb-2">
             {children}
           </blockquote>
         ),
-
-        // Horizontal rule
         hr: () => (
-          <hr className="my-3 border-border/50" />
+          <hr className="my-3 border-white/[0.06]" />
         ),
-
-        // Links
         a: ({ href, children }) => (
-          <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/80 transition-colors">
+          <a href={href} target="_blank" rel="noopener noreferrer" className="text-secondary underline decoration-secondary/30 hover:decoration-secondary/60 transition-colors">
             {children}
           </a>
         ),
@@ -196,39 +171,54 @@ export function ChatPanel() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-background relative">
-      {/* Decorative Background */}
-      <div className="absolute inset-0 bg-[url('/islamic-pattern-opacity.png')] bg-repeat opacity-[0.03] pointer-events-none" />
+    <div className="flex flex-col h-full relative overflow-hidden">
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 z-10">
+      {/* Atmospheric Background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-secondary/[0.03] via-transparent to-primary/[0.02] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[300px] h-[200px] bg-primary/[0.03] rounded-full blur-[100px] pointer-events-none" />
+
+      {/* ─── CHAT HEADER ─── */}
+      <div className="relative z-10 px-6 py-4 border-b border-white/[0.05]">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center ring-1 ring-primary/10">
+            <MoonIcon className="w-3.5 h-3.5 text-primary fill-primary/30" />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-foreground tracking-tight">AI Assistant</h2>
+            <p className="text-[10px] text-muted-foreground">Powered by your documents</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── MESSAGES ─── */}
+      <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5 z-10">
         {messages.map((message) => {
           const isUser = message.role === 'user'
           return (
             <div
               key={message.id}
-              className={`flex items-end gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
+              className={`flex items-start gap-2.5 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
             >
               {/* Avatar */}
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${isUser ? 'bg-secondary text-secondary-foreground' : 'bg-primary text-primary-foreground'
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${isUser
+                  ? 'bg-secondary/15 ring-1 ring-secondary/20'
+                  : 'bg-primary/10 ring-1 ring-primary/15'
                 }`}>
-                {isUser ? <UserIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5 fill-current" />}
+                {isUser
+                  ? <UserIcon className="w-3.5 h-3.5 text-secondary" />
+                  : <MoonIcon className="w-3.5 h-3.5 text-primary fill-primary/30" />
+                }
               </div>
 
-              {/* Message Bubble */}
+              {/* Bubble */}
               <div
-                className={`max-w-[80%] rounded-2xl px-5 py-3 shadow-sm text-sm ${isUser
-                    ? 'bg-secondary text-secondary-foreground rounded-br-none'
-                    : 'bg-card border border-border text-foreground rounded-bl-none'
+                className={`max-w-[78%] rounded-2xl px-4 py-3 text-[13px] leading-relaxed ${isUser
+                    ? 'bg-secondary/10 border border-secondary/10 text-foreground rounded-tr-sm'
+                    : 'bg-white/[0.03] border border-white/[0.06] text-card-foreground rounded-tl-sm'
                   }`}
               >
-                {/* 
-                  KEY CHANGE: 
-                  - User messages = plain text (no markdown needed)
-                  - Assistant messages = rendered as formatted markdown
-                */}
                 {isUser ? (
-                  <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                  <p className="whitespace-pre-wrap">{message.content}</p>
                 ) : (
                   <FormattedMessage content={message.content} />
                 )}
@@ -237,46 +227,44 @@ export function ChatPanel() {
           )
         })}
 
-        {/* Loading Animation */}
+        {/* Loading */}
         {isLoading && (
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center animate-pulse">
-              <SparklesIcon className="w-4 h-4 text-primary" />
+          <div className="flex items-start gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 ring-1 ring-primary/15 flex items-center justify-center">
+              <SparklesIcon className="w-3.5 h-3.5 text-primary animate-pulse" />
             </div>
-            <div className="bg-card px-4 py-2 rounded-lg border border-border shadow-sm">
-              <span className="text-xs text-muted-foreground flex gap-1">
-                <span className="animate-bounce delay-0">.</span>
-                <span className="animate-bounce delay-150">.</span>
-                <span className="animate-bounce delay-300">.</span>
-              </span>
+            <div className="bg-white/[0.03] border border-white/[0.06] px-4 py-2.5 rounded-2xl rounded-tl-sm">
+              <div className="flex gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce [animation-delay:0ms]" />
+                <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce [animation-delay:150ms]" />
+                <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce [animation-delay:300ms]" />
+              </div>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className="p-4 bg-card/80 backdrop-blur-md border-t border-border z-20">
-        <form onSubmit={handleSubmit} className="relative flex items-center gap-2 max-w-4xl mx-auto">
+      {/* ─── INPUT ─── */}
+      <div className="relative z-20 px-5 py-4 border-t border-white/[0.05] bg-card/30 backdrop-blur-xl">
+        <form onSubmit={handleSubmit} className="relative flex items-center gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask anything about the uploaded documents..."
-            className="flex-1 bg-muted/50 hover:bg-muted transition-colors border-0 rounded-full px-6 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-inner"
+            placeholder="Ask anything about your documents..."
+            className="flex-1 bg-white/[0.04] border border-white/[0.07] hover:border-white/[0.10] rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary/25 focus:border-primary/20 transition-all"
           />
           <Button
             type="submit"
             size="icon"
             disabled={isLoading || !input.trim()}
-            className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-110"
+            className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-lg shadow-primary/10 transition-all hover:shadow-primary/20 hover:scale-[1.03] disabled:opacity-30 disabled:hover:scale-100"
           >
-            <SendIcon className="w-5 h-5 ml-0.5" />
+            <SendIcon className="w-4 h-4" />
           </Button>
         </form>
-        <div className="text-center mt-2">
-          <p className="text-[10px] text-muted-foreground opacity-60">AI can make mistakes. Please verify important information.</p>
-        </div>
+        <p className="text-center text-[9px] text-muted-foreground/40 mt-2">AI can make mistakes. Verify important information.</p>
       </div>
     </div>
   )

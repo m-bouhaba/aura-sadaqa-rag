@@ -6,9 +6,12 @@ import { uploadFile } from '@/actions/upload-action'
 
 interface UploadButtonProps {
     onUploadComplete?: (file: File) => void
+    onUploadStart?: () => void
+    onUploadEnd?: () => void
+    className?: string
 }
 
-export function UploadButton({ onUploadComplete }: UploadButtonProps) {
+export function UploadButton({ onUploadComplete, onUploadStart, onUploadEnd, className }: UploadButtonProps) {
     const [isPending, startTransition] = useTransition()
     const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -20,6 +23,8 @@ export function UploadButton({ onUploadComplete }: UploadButtonProps) {
         const file = e.target.files?.[0]
         if (!file) return
 
+        onUploadStart?.()
+
         startTransition(async () => {
             const formData = new FormData()
             formData.append('file', file)
@@ -30,9 +35,10 @@ export function UploadButton({ onUploadComplete }: UploadButtonProps) {
                 onUploadComplete?.(file)
             } else {
                 console.error('Upload failed:', result.message)
-                // Ideally display toast here
                 alert(result.message || 'Upload failed')
             }
+
+            onUploadEnd?.()
 
             // Reset input
             if (fileInputRef.current) {
@@ -53,17 +59,17 @@ export function UploadButton({ onUploadComplete }: UploadButtonProps) {
             <button
                 onClick={handleUploadClick}
                 disabled={isPending}
-                className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:bg-accent/90 transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+                className={`group relative overflow-hidden rounded-xl border border-dashed border-white/[0.10] hover:border-primary/30 bg-white/[0.02] hover:bg-primary/[0.04] px-4 py-3 text-xs font-medium text-muted-foreground hover:text-primary transition-all duration-300 flex items-center justify-center gap-2.5 disabled:opacity-40 cursor-pointer ${className || ''}`}
             >
                 {isPending ? (
                     <>
-                        <Loader2Icon className="h-4 w-4 animate-spin" />
-                        <span>Processing...</span>
+                        <Loader2Icon className="h-4 w-4 animate-spin text-primary" />
+                        <span className="text-primary/80">Processing…</span>
                     </>
                 ) : (
                     <>
-                        <UploadIcon className="h-4 w-4" />
-                        <span>+ Upload File</span>
+                        <UploadIcon className="h-4 w-4 group-hover:text-primary transition-colors" />
+                        <span>Upload PDF or XLSX</span>
                     </>
                 )}
             </button>

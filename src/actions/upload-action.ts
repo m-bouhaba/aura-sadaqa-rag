@@ -3,90 +3,160 @@
 import { pinecone, indexName } from '@/lib/pinecone'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import * as XLSX from 'xlsx'
-// import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs'
+import pdf from 'pdf-parse'
 
+// =====================
 // Gemini Embeddings
+// =====================
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-const model = genAI.getGenerativeModel({ model: 'gemini-embedding-001' })
+const embeddingModel = genAI.getGenerativeModel({
+  model: 'gemini-embedding-001',
+})
 
+// =====================
+// Helpers
+// =====================
 async function generateEmbedding(text: string): Promise<number[]> {
-  const res = await model.embedContent(text)
+  const res = await embeddingModel.embedContent(text)
   return res.embedding.values
 }
 
-function chunkText(text: string, size = 500): string[] {
+function cleanText(text: string): string {
+  return text.replace(/\s+/g, ' ').trim()
+}
+
+function chunkText(
+  text: string,
+  size = 1000,
+  overlap = 150
+): string[] {
   const chunks: string[] = []
-  for (let i = 0; i < text.length; i += size) {
-    chunks.push(text.slice(i, i + size))
+  let start = 0
+
+  while (start < text.length) {
+    const end = start + size
+    chunks.push(text.slice(start, end))
+    start = end - overlap
   }
+
   return chunks
 }
 
+// =====================
+// Main Action
+// =====================
 export async function uploadFile(formData: FormData) {
-  const file = formData.get('file') as File
-  if (!file) return { success: false, message: 'No file' }
+  try {
+    const file = formData.get('file') as File
+    if (!file) {
+      return { success: false, message: 'No file provided' }
+    }
 
-  const buffer = Buffer.from(await file.arrayBuffer())
-  let text = ''
+    const buffer = Buffer.from(await file.arrayBuffer())
+    let text = ''
 
-  // ===== PDF =====
-  //   if (file.type === 'application/pdf') {
-  //     const pdf = await pdfjs.getDocument({ data: buffer }).promise
-  //     for (let i = 1; i <= pdf.numPages; i++) {
-  //       const page = await pdf.getPage(i)
-  //       const content = await page.getTextContent()
-  //       const strings = content.items.map((it: any) => it.str)
-  //       text += strings.join(' ') + '\n'
-  //     }
-  //   }
+    // =====================
+    // PDF Parsing
+    // =====================
+    if (file.type === 'application/pdf') {
+      const buffer = Buffer.from(await file.arrayBuffer())
+      const data = await pdf(buffer) // ✅ parse directement le buffer
+      text = data.text
+    }
 
-  // ===== XLSX =====
-  if (file.name.endsWith('.xlsx')) {
-    const wb = XLSX.read(buffer, { type: 'buffer' })
-    wb.SheetNames.forEach(name => {
-      const sheet = wb.Sheets[name]
-      // Smart parsing: Convert to JSON to preserve header-value relationships
-      const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" }) as Record<string, any>[]
+    // =====================
+    // XLSX Parsing
+    // =====================
+    else if (file.name.endsWith('.xlsx')) {
+      const wb = XLSX.read(buffer, { type: 'buffer' })
 
-      if (rows.length > 0) {
-        text += `--- Sheet: ${name} ---\n`
-        rows.forEach((row, index) => {
-          // Convert row object to a readable string: "Name: Ahmed, Age: 30..."
-          const rowText = Object.entries(row)
-            .filter(([_, val]) => val !== "") // Skip empty cells
-            .map(([header, val]) => `${header}: ${val}`)
-            .join(", ")
-          text += `Row ${index + 1}: ${rowText}\n`
-        })
+      wb.SheetNames.forEach((sheetName) => {
+        const sheet = wb.Sheets[sheetName]
+        const rows = XLSX.utils.sheet_to_json(sheet, {
+          defval: '',
+        }) as Record<string, any>[]
+
+        if (rows.length > 0) {
+          text += `--- Sheet: ${sheetName} ---\n`
+
+          rows.forEach((row, index) => {
+            const rowText = Object.entries(row)
+              .filter(([_, val]) => val !== '')
+              .map(([key, val]) => `${key}: ${val}`)
+              .join(', ')
+
+            if (rowText) {
+              text += `Row ${index + 1}: ${rowText}\n`
+            }
+          })
+        }
+      })
+    }
+
+    // =====================
+    // Unsupported type
+    // =====================
+    else {
+      return {
+        success: false,
+        message: 'Unsupported file type (PDF or XLSX only)',
       }
-    })
-  } else {
-    return { success: false, message: 'Unsupported file type' }
-  }
+    }
 
-  text = text.replace(/\s+/g, ' ').trim()
-  if (!text) return { success: false, message: 'No text extracted' }
+    // =====================
+    // Text cleanup
+    // =====================
+    text = cleanText(text)
+    if (!text) {
+      return { success: false, message: 'No text extracted' }
+    }
 
-  const chunks = chunkText(text)
-  const index = pinecone.index(indexName)
+    // =====================
+    // Chunking
+    // =====================
+    const chunks = chunkText(text)
 
-  for (let i = 0; i < chunks.length; i++) {
-    const embedding = await generateEmbedding(chunks[i])
+    // =====================
+    // Embeddings (PARALLEL)
+    // =====================
+    const embeddings = await Promise.all(
+      chunks.map(async (chunk) => ({
+        text: chunk,
+        embedding: await generateEmbedding(chunk),
+      }))
+    )
+
+    // =====================
+    // Pinecone Batch Upsert
+    // =====================
+    const index = pinecone.index(indexName)
+
     await index.upsert({
-      namespace: 'documents', // 👈 AJOUT CRUCIAL
-      records: [
-        {
-          id: `${file.name}-${i}-${Date.now()}`,
-          values: embedding,
-          metadata: {
-            file: file.name,
-            chunk: i,
-            text: chunks[i],
-          },
+      namespace: 'documents',
+      records: embeddings.map((item, i) => ({
+        id: `${file.name}-${i}-${Date.now()}`,
+        values: item.embedding,
+        metadata: {
+          file: file.name,
+          chunk: i,
+          text: item.text,
         },
-      ],
+      })),
     })
-  }
 
-  return { success: true, chunks: chunks.length }
+    // =====================
+    // Success
+    // =====================
+    return {
+      success: true,
+      file: file.name,
+      chunks: chunks.length,
+    }
+  } catch (error) {
+    console.error('Upload error:', error)
+    return {
+      success: false,
+      message: 'Error while processing the file',
+    }
+  }
 }

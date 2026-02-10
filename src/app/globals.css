@@ -1,96 +1,219 @@
 @import "tailwindcss";
 
 @theme {
-  /* =========================
-      Base - Deep Night & Moonlight
-  ========================== */
-  --color-background: #050811; /* Darker, deeper night sky */
-  --color-foreground: #f4f4f9; /* Soft moonlight white */
+   /* ══════════════════════════════════
+     BASE — Ramadan Midnight Sky
+     Deep, dark background like a clear
+     night sky during Ramadan
+  ══════════════════════════════════ */
+   --color-background: #04060e;
+   --color-foreground: #eef0f6;
 
-  /* =========================
-      Cards & Panels - Glassmorphism ready
-  ========================== */
-  --color-card: #0a1122; 
-  --color-card-foreground: #e2e8f0;
+   /* ══════════════════════════════════
+     CARD — Frosted Midnight Glass
+     Used for panels, bubbles, and
+     glassmorphism containers
+  ══════════════════════════════════ */
+   --color-card: #0b1120;
+   --color-card-foreground: #dfe3ec;
 
-  /* =========================
-      Popovers
-  ========================== */
-  --color-popover: #0a1122;
-  --color-popover-foreground: #f4f4f9;
+   /* ══════════════════════════════════
+     POPOVER — Matches the card style
+  ══════════════════════════════════ */
+   --color-popover: #0b1120;
+   --color-popover-foreground: #eef0f6;
 
-  /* =========================
-      Primary — The Golden Lantern Glow
-  ========================== */
-  --color-primary: #d4af37; /* Metallic Gold */
-  --color-primary-foreground: #050811;
+   /* ══════════════════════════════════
+     PRIMARY — Royal Gold
+     The warm golden glow of a Ramadan
+     lantern. Used for highlights,
+     icons, send button, focus rings
+  ══════════════════════════════════ */
+   --color-primary: #c9a227;
+   --color-primary-foreground: #04060e;
 
-  /* =========================
-      Secondary — Warm Amber
-  ========================== */
-  --color-secondary: #f59e0b; /* Amber 500 */
-  --color-secondary-foreground: #050811;
+   /* ══════════════════════════════════
+     SECONDARY — Indigo Twilight
+     The deep violet-blue of the night
+     sky. Used for user bubbles, links,
+     code highlights, and accents
+  ══════════════════════════════════ */
+   --color-secondary: #6366f1;
+   --color-secondary-foreground: #eef0f6;
 
-  /* =========================
-      Muted
-  ========================== */
-  --color-muted: #1a2238; 
-  --color-muted-foreground: #94a3b8;
+   /* ══════════════════════════════════
+     MUTED — Dimmed surfaces
+     Subtle inputs, disabled states,
+     and background surfaces
+  ══════════════════════════════════ */
+   --color-muted: #111827;
+   --color-muted-foreground: #7c8599;
 
-  /* =========================
-      Accent — Soft Sand/Silk Glow
-  ========================== */
-  --color-accent: #ffedd5; /* Warm Orange 50 */
-  --color-accent-foreground: #050811;
+   /* ══════════════════════════════════
+     ACCENT — Deep Indigo Surface
+     Used for upload button, special
+     surface areas with gold text
+  ══════════════════════════════════ */
+   --color-accent: #1e1b4b;
+   --color-accent-foreground: #c9a227;
 
-  /* =========================
-      Destructive
-  ========================== */
-  --color-destructive: #ef4444;
-  --color-destructive-foreground: #ffffff;
+   /* ══════════════════════════════════
+     DESTRUCTIVE — Error / Delete
+  ══════════════════════════════════ */
+   --color-destructive: #dc2626;
+   --color-destructive-foreground: #ffffff;
 
-  /* =========================
-      Borders & Inputs
-  ========================== */
-  --color-border: #2d3748;
-  --color-input: #1a2238;
-  --color-ring: #d4af37;
+   /* ══════════════════════════════════
+     BORDERS & INPUTS
+     Ultra-subtle borders using
+     indigo tint for cohesion
+  ══════════════════════════════════ */
+   --color-border: rgba(99, 102, 241, 0.12);
+   --color-input: #111827;
+   --color-ring: #c9a227;
 
-  /* =========================
-      Charts / Data - Ramadan Palette
-  ========================== */
-  --color-chart-1: #d4af37; /* Gold */
-  --color-chart-2: #f59e0b; /* Amber */
-  --color-chart-3: #10b981; /* Emerald (Islamic Green) */
-  --color-chart-4: #fbbf24; /* Yellow */
-  --color-chart-5: #6366f1; /* Indigo Sky */
+   /* ══════════════════════════════════
+     SIDEBAR — If used later
+  ══════════════════════════════════ */
+   --color-sidebar: #070b18;
+   --color-sidebar-foreground: #dfe3ec;
+   --color-sidebar-primary: #c9a227;
+   --color-sidebar-primary-foreground: #04060e;
+   --color-sidebar-accent: #1e1b4b;
+   --color-sidebar-accent-foreground: #c9a227;
+   --color-sidebar-border: rgba(99, 102, 241, 0.08);
+   --color-sidebar-ring: #c9a227;
+
+   /* ══════════════════════════════════
+     CHARTS — Ramadan Palette
+  ══════════════════════════════════ */
+   --color-chart-1: #c9a227;
+   --color-chart-2: #6366f1;
+   --color-chart-3: #10b981;
+   --color-chart-4: #f59e0b;
+   --color-chart-5: #8b5cf6;
+
+   /* ══════════════════════════════════
+     RADIUS
+  ══════════════════════════════════ */
+   --radius: 0.625rem;
 }
 
-/* =========================
-   Background Pattern (Islamic Geometric Subtle)
-========================== */
+/* ══════════════════════════════════════
+   ISLAMIC GEOMETRIC DOT PATTERN
+   Subtle double-layer dots in gold
+   and indigo, like mosque tilework
+══════════════════════════════════════ */
 .bg-pattern {
-  /* Using a warm gold tint for the subtle dots */
-  background-image: radial-gradient(
-    rgba(212, 175, 55, 0.15) 1px, 
-    transparent 1px
-  );
-  background-size: 30px 30px;
-  opacity: 0.12;
+   background-image:
+      radial-gradient(rgba(99, 102, 241, 0.06) 1px, transparent 1px),
+      radial-gradient(rgba(201, 162, 39, 0.04) 1px, transparent 1px);
+   background-size: 32px 32px, 48px 48px;
+   background-position: 0 0, 16px 16px;
 }
 
-/* =========================
-   Hero Video Enhancements
-========================== */
+/* ══════════════════════════════════════
+   GLOW EFFECTS
+   Atmospheric halos behind workspace
+   and important UI elements
+══════════════════════════════════════ */
+.glow-gold {
+   box-shadow:
+      0 0 60px -12px rgba(201, 162, 39, 0.15),
+      0 0 120px -20px rgba(201, 162, 39, 0.08);
+}
+
+.glow-indigo {
+   box-shadow:
+      0 0 80px -12px rgba(99, 102, 241, 0.12),
+      0 0 160px -20px rgba(99, 102, 241, 0.06);
+}
+
+/* ══════════════════════════════════════
+   SCROLLBAR — Minimal & Elegant
+   Thin indigo scrollbar that blends
+   into the dark background
+══════════════════════════════════════ */
+::-webkit-scrollbar {
+   width: 5px;
+   height: 5px;
+}
+
+::-webkit-scrollbar-track {
+   background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+   background: rgba(99, 102, 241, 0.18);
+   border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+   background: rgba(99, 102, 241, 0.32);
+}
+
+/* ══════════════════════════════════════
+   SMOOTH SCROLLING
+══════════════════════════════════════ */
+html {
+   scroll-behavior: smooth;
+}
+
+/* ══════════════════════════════════════
+   SELECTION HIGHLIGHT
+   Gold selection for the premium feel
+══════════════════════════════════════ */
+::selection {
+   background: rgba(201, 162, 39, 0.25);
+   color: #eef0f6;
+}
+
+/* ══════════════════════════════════════
+   VIDEO HERO — Landing Page
+══════════════════════════════════════ */
 .hero-video-container {
-  position: relative;
-  overflow: hidden;
+   position: relative;
+   overflow: hidden;
 }
 
-/* Adds a vignette effect to blend the video edges into your background color */
 .hero-video-overlay {
-  background: radial-gradient(circle, transparent 20%, var(--color-background) 100%);
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+   background: radial-gradient(circle, transparent 20%, var(--color-background) 100%);
+   position: absolute;
+   inset: 0;
+   pointer-events: none;
+}
+
+/* ══════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════ */
+@keyframes fade-in {
+   from {
+      opacity: 0;
+      transform: translateY(8px);
+   }
+
+   to {
+      opacity: 1;
+      transform: translateY(0);
+   }
+}
+
+@keyframes slide-up {
+   from {
+      opacity: 0;
+      transform: translateY(16px);
+   }
+
+   to {
+      opacity: 1;
+      transform: translateY(0);
+   }
+}
+
+.animate-fade-in {
+   animation: fade-in 0.4s ease-out both;
+}
+
+.animate-slide-up {
+   animation: slide-up 0.5s ease-out both;
 }
